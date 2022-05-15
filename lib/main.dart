@@ -1,37 +1,10 @@
+import 'package:dogify/ui/dev.dart';
+import 'package:dogify/ui/home.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(const MyApp());
-}
-
-Future<Dog> getCountries() async {
-  const url = 'https://dog.ceo/api/breeds/image/random';
-  var response = await http.get(Uri.parse(url));
-  if (response.statusCode == 200) {
-    return Dog.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('An error occured');
-  }
-}
-
-class Dog {
-  final String image;
-
-  Dog({required this.image});
-
-  factory Dog.fromJson(Map<String, dynamic> json) {
-    return Dog(
-      image: json['message'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['image'] = image;
-    return data;
-  }
 }
 
 class MyApp extends StatelessWidget {
@@ -61,43 +34,64 @@ class Dogify extends StatefulWidget {
 }
 
 class _DogifyState extends State<Dogify> {
-  late Future<Dog> myData;
+  void launchEmail() async {
+    String url = 'https://github.com/Karumaidoi/dogify';
 
-  @override
-  void initState() {
-    myData = getCountries();
-    super.initState();
+    await canLaunch(url) ? launch(url) : print('Unable');
   }
+
+  int index = 0;
+  // ignore: non_constant_identifier_names
+  final Screens = [
+    HomeDog(),
+    SettingsPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dog\'s API 🐕 🐕 🐕', style: TextStyle(fontSize: 14,),),
+        title: const Text(
+          'Dog\'s API 🐕 🐕 🐕',
+          style: TextStyle(
+            fontSize: 14,
+          ),
+        ),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                launchEmail();
+              },
+              icon: const Icon(
+                Icons.source,
+                color: Colors.white,
+              ))
+        ],
       ),
-      body: FutureBuilder<Dog>(
-          future: myData,
-          builder: ((context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            return Center(
-              child: Stack(
-                children: [
-                  Image(image: NetworkImage(snapshot.data!.image)),
-                  Positioned(top: 10, right: 15,child: Container( decoration: BoxDecoration(color: Colors.purple,borderRadius: BorderRadius.circular(12)), padding: EdgeInsets.all(12),child: Text(snapshot.data!.image.split('breeds\/')[1].split('/')[0])),)
-                ],
-              ),
-             
-            );
-          })),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          myData = getCountries();
-          setState(() { });
-        },
-        child: const Icon(Icons.swap_vert_circle, color: Colors.white,),
+      body: Screens[index],
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          // indicatorColor: Colors.blue.shade200,
+          labelTextStyle: MaterialStateProperty.all(const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+          )),
+        ),
+        child: NavigationBar(
+            selectedIndex: index,
+            height: 80,
+            onDestinationSelected: (index) =>
+                setState(() => this.index = index),
+            destinations: const [
+              NavigationDestination(
+                  icon: Icon(Icons.home_rounded),
+                  label: 'Home',
+                  selectedIcon: Icon(Icons.home_filled)),
+              NavigationDestination(
+                  icon: Icon(Icons.code),
+                  label: 'Dev',
+                  selectedIcon: Icon(Icons.code)),
+            ]),
       ),
     );
   }
