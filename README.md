@@ -1,6 +1,6 @@
 # dogify
 
-A new Flutter project.
+A flutter project for making API calls in flutter & Dart. KISS has been used to keep the UI simple & clean. Feel free to folk and use it in your projects.
 
 ## Getting Started
 
