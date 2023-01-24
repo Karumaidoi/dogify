@@ -1,7 +1,8 @@
-import 'package:dogify/ui/dev.dart';
-import 'package:dogify/ui/home.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'ui/dev.dart';
+import 'ui/home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,6 +38,7 @@ class _DogifyState extends State<Dogify> {
   void launchEmail() async {
     String url = 'https://github.com/Karumaidoi/dogify';
 
+    // ignore: avoid_print
     await canLaunch(url) ? launch(url) : print('Unable');
   }
 
@@ -44,7 +46,7 @@ class _DogifyState extends State<Dogify> {
   // ignore: non_constant_identifier_names
   final Screens = [
     HomeDog(),
-    SettingsPage(),
+    const SettingsPage(),
   ];
 
   @override
